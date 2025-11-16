@@ -28,7 +28,7 @@ BugHunter is an intelligent agent that streamlines the bug fixing workflow by:
 *The main interface showing Sentry issues, repository configuration and selected issue*
 
 ### Proposed Fix
-![Proposed Fix](screenshots/proposed-fix.png)
+![Proposed Fix](screenshots/proposed_fix.png)
 *Gemini-generated fix with explanation and code changes*
 
 ### Pull Request Created
