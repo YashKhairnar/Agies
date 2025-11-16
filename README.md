@@ -21,6 +21,34 @@ BugHunter is an intelligent agent that streamlines the bug fixing workflow by:
 - 🔄 **Automated PR Creation**: Creates draft pull requests with detailed descriptions
 - 🎨 **Streamlit UI**: User-friendly web interface for monitoring and controlling the bug fixing process
 
+## 📸 Screenshots
+
+### Main Dashboard
+![Main Dashboard](screenshots/dashboard.png)
+*The main interface showing Sentry issues and repository configuration*
+
+### Issue Selection
+![Issue Selection](screenshots/issue-selection.png)
+*Selecting a Sentry issue to investigate*
+
+### File Analysis
+![File Analysis](screenshots/file-analysis.png)
+*AI-powered file discovery showing relevant files and reasons*
+
+### Proposed Fix
+![Proposed Fix](screenshots/proposed-fix.png)
+*Gemini-generated fix with explanation and code changes*
+
+### Test Results
+![Test Results](screenshots/test-results.png)
+*Daytona sandbox test execution results*
+
+### Pull Request Created
+![PR Created](screenshots/pr-created.png)
+*Successfully created draft pull request on GitHub*
+
+> 📝 **Note**: Add your screenshots to the `screenshots/` directory and name them accordingly (e.g., `dashboard.png`, `issue-selection.png`, etc.)
+
 ## 🏗️ Architecture
 
 > 📖 **For detailed architecture documentation, see [ARCHITECTURE.md](ARCHITECTURE.md)**

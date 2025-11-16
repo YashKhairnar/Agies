@@ -4,7 +4,7 @@ from agent import app, AgentState
 from tools import get_sentry_issues
 import os
 
-st.title("🪲 BugHunter Agent – Daytona HackSprint")
+st.title("🪲 BugHunter Agent ")
 
 # GitHub Repository Input
 st.subheader("📦 GitHub Repository")
