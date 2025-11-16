@@ -23,10 +23,137 @@ BugHunter is an intelligent agent that streamlines the bug fixing workflow by:
 
 ## 🏗️ Architecture
 
-The agent uses a **LangGraph StateGraph** workflow with the following nodes:
+> 📖 **For detailed architecture documentation, see [ARCHITECTURE.md](ARCHITECTURE.md)**
 
+### System Architecture Diagram
+
+```mermaid
+graph TB
+    subgraph "User Interface"
+        UI[Streamlit Web UI]
+    end
+    
+    subgraph "BugHunter Agent Core"
+        AGENT[LangGraph StateGraph Agent]
+        STATE[AgentState<br/>- error_id<br/>- sentry_data<br/>- repo_url<br/>- relevant_files<br/>- proposed_fix<br/>- reproduction_steps]
+    end
+    
+    subgraph "Workflow Nodes"
+        N1[sentry_analysis]
+        N2[propose_fix]
+        N3[daytona]
+        N4[approval]
+        N5[create_pr]
+    end
+    
+    subgraph "Tools & Integrations"
+        TOOLS[tools.py]
+        SENTRY_API[Sentry API Client]
+        GITHUB_API[GitHub API Client]
+        BROWSER[browser_use Agent]
+        DAYTONA_API[Daytona API Client]
+    end
+    
+    subgraph "External Services"
+        SENTRY[(Sentry<br/>Error Tracking)]
+        GEMINI[Google Gemini<br/>2.5 Flash]
+        GITHUB[(GitHub<br/>Repository)]
+        DAYTONA[(Daytona<br/>Sandbox)]
+    end
+    
+    UI -->|Start Investigation| AGENT
+    UI -->|User Approval| N4
+    
+    AGENT --> STATE
+    STATE --> N1
+    N1 --> N2
+    N2 --> N3
+    N3 --> N4
+    N4 -->|Approved| N5
+    N5 --> END[End]
+    
+    N1 --> TOOLS
+    N2 --> TOOLS
+    N3 --> TOOLS
+    N5 --> TOOLS
+    
+    TOOLS --> SENTRY_API
+    TOOLS --> GITHUB_API
+    TOOLS --> BROWSER
+    TOOLS --> DAYTONA_API
+    
+    SENTRY_API <-->|Fetch Issues/Events| SENTRY
+    GITHUB_API <-->|Create PR/Branch| GITHUB
+    BROWSER -->|Navigate & Analyze| GITHUB
+    DAYTONA_API <-->|Create/Test Sandbox| DAYTONA
+    N2 -->|Generate Fix| GEMINI
+    
+    AGENT -->|Stream Updates| UI
+    N4 -->|Await Approval| UI
+    
+    style UI fill:#ff6b6b
+    style AGENT fill:#4ecdc4
+    style STATE fill:#95e1d3
+    style GEMINI fill:#ffe66d
+    style SENTRY fill:#a8dadc
+    style GITHUB fill:#457b9d
+    style DAYTONA fill:#e63946
 ```
-sentry_analysis → propose_fix → daytona → approval → create_pr → END
+
+### Workflow Sequence Diagram
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Streamlit as Streamlit UI
+    participant Agent as LangGraph Agent
+    participant Sentry
+    participant Browser as browser_use
+    participant Gemini as Google Gemini
+    participant Daytona
+    participant GitHub
+    
+    User->>Streamlit: Select Sentry Issue
+    User->>Streamlit: Start Investigation
+    
+    Streamlit->>Agent: Initialize Workflow
+    
+    Note over Agent: Node 1: sentry_analysis
+    Agent->>Sentry: Fetch Error Details
+    Sentry-->>Agent: Error Data (stack trace, message)
+    Agent->>Browser: Navigate GitHub Repo
+    Browser->>GitHub: Find Relevant Files
+    GitHub-->>Browser: File Paths & Context
+    Browser-->>Agent: Relevant Files Analysis
+    
+    Note over Agent: Node 2: propose_fix
+    Agent->>Gemini: Analyze Error + Files
+    Gemini-->>Agent: Proposed Fix with Code
+    
+    Note over Agent: Node 3: daytona
+    Agent->>Daytona: Create Sandbox
+    Daytona-->>Agent: Workspace ID
+    Agent->>Daytona: Clone Repo & Apply Fix
+    Agent->>Daytona: Run Tests
+    Daytona-->>Agent: Test Results
+    
+    Note over Agent: Node 4: approval
+    Agent->>Streamlit: Show Results & Fix
+    Streamlit->>User: Display Fix & Test Results
+    User->>Streamlit: Approve/Reject
+    
+    alt User Approves
+        Streamlit->>Agent: Continue Workflow
+        Note over Agent: Node 5: create_pr
+        Agent->>GitHub: Create Branch
+        Agent->>GitHub: Create Draft PR
+        GitHub-->>Agent: PR URL
+        Agent->>Streamlit: PR Created
+        Streamlit->>User: Show PR Link
+    else User Rejects
+        Streamlit->>Agent: Stop Workflow
+        Agent-->>Streamlit: Workflow Stopped
+    end
 ```
 
 ### Node Descriptions
